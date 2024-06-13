@@ -10,7 +10,6 @@ app = Flask(__name__)
 line_bot_api = LineBotApi(os.environ['CHANNEL_ACCESS_TOKEN'])
 handler = WebhookHandler(os.environ['CHANNEL_SECRET'])
 
-# 餐廳資料
 data = [
     ["晚餐", "清夜", "小洞天", ""],
     ["晚餐", "清夜", "重慶酸辣粉", "紅薯粉絲＋小辣中酸其餘隨便"],
