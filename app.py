@@ -244,6 +244,30 @@ data = [
     ["飲料甜點", "女二", "全家便利商店", ""]
 ]
 
+emoji = [
+    "d(`･∀･)b",
+    "(*´∀`)~♥",
+    "_(:3 」∠ )_",
+    "(σ′▽‵)′▽‵)σ",
+    "(⁰▿⁰)",
+    "(∂ω∂)",
+    "･*･:≡(　ε:)",
+    "ヽ(・×・´)ゞ",
+    "♥(´∀` )人",
+    "(๑ơ ₃ ơ)♥",
+    "(●´ω｀●)ゞ",
+    "(๑´ㅁ`)",
+    "o(☆Ф∇Ф☆)o",
+    "✧◝(⁰▿⁰)◜✧",
+    "(・ε・)",
+    "(｢･ω･)｢",
+    "＼(●´ϖ`●)／",
+    "( *´◒`*)",
+    "(♡˙︶˙♡)",
+    "ᕕ ( ᐛ ) ᕗ",
+    "(◍•ᴗ•◍)ゝ"
+]
+
 user_state = {}
 
 @app.route("/callback", methods=['POST'])
@@ -268,23 +292,33 @@ def handle_message(event):
 
     if message in ["早餐", "午餐", "晚餐", "宵夜", "飲料甜點"]:
         user_state[user_id]['meal_type'] = message
-        response = "在哪裡吃? 一餐/二餐/女二/研三/隨便"
-    elif message in ["一餐", "二餐", "女二", "研三", "隨便"]:
+        response = "尼想在哪吃(੭ ᐕ)੭？ 一餐/二餐/女二/研三/清夜/隨便"
+    elif message in ["一餐", "二餐", "女二", "研三", "清夜", "隨便"]:
         meal_type = user_state[user_id].get('meal_type')
         if not meal_type:
-            response = "請先告訴我你想吃什麼 (早餐/午餐/晚餐/宵夜/飲料甜點)"
+            response = "尼想吃神摸(´･ω･`)? (早餐/午餐/晚餐/宵夜/飲料甜點)"
         else:
             if message == "隨便":
-                selected_restaurant = random.choice([d for d in data if d[0] == meal_type])
+                filtered_data = [d for d in data if d[0] == meal_type]
             else:
-                selected_restaurant = random.choice([d for d in data if d[0] == meal_type and d[1] == message])
-            response = f"{selected_restaurant[2]} - {selected_restaurant[3]}" if selected_restaurant[3] else f"{selected_restaurant[2]}"
+                filtered_data = [d for d in data if d[0] == meal_type and d[1] == message]
+            
+            if not filtered_data:
+                response = "找不到耶( ´•̥×•̥` ) 試試其他選項吧(･8･)"
+            else:
+                selected_restaurant = random.choice(filtered_data)
+                selected_emoji = random.choice(emoji)
+                if selected_restaurant[3]:
+                    response = f"就決定 4 尼ㄌ！{selected_restaurant[1]} - {selected_restaurant[2]} - {selected_restaurant[3]} {selected_emoji}"
+                else:
+                    response = f"就決定 4 尼ㄌ！{selected_restaurant[1]} - {selected_restaurant[2]} {selected_emoji}"
             user_state.pop(user_id)
     else:
-        response = "請輸入有效的選項 (早餐/午餐/晚餐/宵夜/飲料甜點 或 一餐/二餐/女二/研三/隨便)"
+        response = "請豪豪打字(｡ŏ_ŏ) (早餐/午餐/晚餐/宵夜/飲料甜點)"
 
     line_bot_api.reply_message(reply_token, TextSendMessage(text=response))
-
+    
+import os
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
